@@ -83,13 +83,13 @@ function SBObj(theOwnerKey, theDataId) {
         var aDataObj = {"type": "application/json", "content": "{}"};
         //no content needed
         private_SendDataObj("DELETE", aDataObj);
-    }
+    };
 
     this.GET = function () {
         var aDataObj = {"type": "application/json", "content": "{}"};
         //no content needed
         private_SendDataObj("GET", aDataObj);
-    }
+    };
 
     this.PUT = function (theBlob) {
         var aFormData = new FormData();
@@ -97,12 +97,12 @@ function SBObj(theOwnerKey, theDataId) {
         var aDataObj = {"type": "multipart/form-data", "content": aFormData};
 
         private_SendDataObj("POST", aDataObj);
-    }
+    };
 }
 
 SBObj.getDefault = function (arg, val) {
     return typeof arg !== 'undefined' ? arg : val;
-}
+};
 
 SBObj.API_BASE_URL = "https://storagebin.appspot.com";
 SBObj.DATA_BASE_URL = "/data";

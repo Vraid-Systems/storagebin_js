@@ -26,4 +26,4 @@ asyncTest("PUT", 1, function() {
 
 String.prototype.contains = function (theOtherString) {
     return (this.indexOf(theOtherString) !== -1);
-}
+};
