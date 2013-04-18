@@ -26,8 +26,8 @@ function SBObj(theOwnerKey, theDataId) {
     /**
      * create a CORS request object
      *
-     * @param method String - GET or POST
-     * @param url String
+     * @param method {String}
+     * @param url {String}
      * @returns {XMLHttpRequest}
      */
     function private_CreateRequest(method, url) {
@@ -43,6 +43,11 @@ function SBObj(theOwnerKey, theDataId) {
         return xhr;
     }
 
+    /**
+     * create the String representation of the data end point URL
+     *
+     * @returns {String}
+     */
     function private_CreateRequestUrl() {
         var aRetEventUrl = SBObj.API_BASE_URL + SBObj.DATA_BASE_URL;
 
@@ -64,9 +69,15 @@ function SBObj(theOwnerKey, theDataId) {
         return aRetEventUrl;
     }
 
-    function private_SendDataObj(theMethod, theDataObj) {
-        if (theMethod && theDataObj && theDataObj.type && theDataObj.content) {
-            var aRequest = private_CreateRequest(theMethod, private_CreateRequestUrl());
+    /**
+     * kick-off the CORS data end point interaction
+     * 
+     * @param method {String}
+     * @param theDataObj {Object} - must contain fields "type" and "content"
+     */
+    function private_SendDataObj(method, theDataObj) {
+        if (method && theDataObj && theDataObj.type && theDataObj.content) {
+            var aRequest = private_CreateRequest(method, private_CreateRequestUrl());
 
             if (aRequest) {
                 aRequest.setRequestHeader("Content-Type", theDataObj.type);
@@ -91,9 +102,9 @@ function SBObj(theOwnerKey, theDataId) {
         private_SendDataObj("GET", aDataObj);
     };
 
-    this.PUT = function (theBlob) {
+    this.PUT = function (theData) {
         var aFormData = new FormData();
-        aFormData.append("file", theBlob);
+        aFormData.append("file", theData);
         var aDataObj = {"type": "multipart/form-data", "content": aFormData};
 
         private_SendDataObj("POST", aDataObj);
@@ -102,6 +113,10 @@ function SBObj(theOwnerKey, theDataId) {
 
 SBObj.getDefault = function (arg, val) {
     return typeof arg !== 'undefined' ? arg : val;
+};
+
+SBObj.setApiBaseUrl = function (theNewUrl) {
+    SBObj.API_BASE_URL = theNewUrl;
 };
 
 SBObj.API_BASE_URL = "https://storagebin.appspot.com";

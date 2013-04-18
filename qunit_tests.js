@@ -16,14 +16,19 @@ var aOnErrorFunc = function(e){
     start();
 };
 
-asyncTest("PUT", 1, function() {
-    var aSBObj = new SBObj(0, 0);
-    aSBObj.setOnLoad(aOnLoadFunc);
-    aSBObj.setOnError(aOnErrorFunc);
+var aSBObj = new SBObj("owner-key", 42); //TODO change me: owner key, data id
+aSBObj.setOnLoad(aOnLoadFunc);
+aSBObj.setOnError(aOnErrorFunc);
+aSBObj.setApiBaseUrl("http://localhost:8001"); //TODO change me
 
-    aSBObj.PUT(); //TODO read Blob from FS <---
+asyncTest("PUT", 1, function() {
+    aSBObj.PUT("test text data to store");
 });
 
-String.prototype.contains = function (theOtherString) {
-    return (this.indexOf(theOtherString) !== -1);
-};
+asyncTest("GET", 2, function() {
+    aSBObj.GET();
+});
+
+asyncTest("DELETE", 3, function() {
+    aSBObj.DELETE();
+});
