@@ -1,12 +1,12 @@
 /**
  * JavaScript Object library for asynchronously interacting with a storagebin
  * service using Cross-Origin Resource Sharing. NO jQuery needed.
- *
+ * 
  * CORS browser support minimums: Gecko 1.9.1 (Firefox 3.5, SeaMonkey 2.0),
  * Safari 4, Google Chrome 3, MSHTML/Trident 4.0 (Internet Explorer 8) via
  * XDomainRequest, Opera 12.00, Opera Mobile 12
  * http://en.wikipedia.org/wiki/Cross-origin_resource_sharing#Browser_support
- *
+ * 
  * `getDefault` method body taken from http://stackoverflow.com/a/894877
  */
 function SBObj(theOwnerKey, theDataId) {
@@ -41,7 +41,7 @@ function SBObj(theOwnerKey, theDataId) {
 
     /**
      * create a CORS request object
-     *
+     * 
      * @param method {String}
      * @param url {String}
      * @returns {XMLHttpRequest}
@@ -61,25 +61,19 @@ function SBObj(theOwnerKey, theDataId) {
 
     /**
      * create the String representation of the data end point URL
-     *
+     * 
+     * @param isPut {Boolean}
      * @returns {String}
      */
-    function private_CreateRequestUrl() {
-        var aRetEventUrl = SBObj.API_BASE_URL + SBObj.DATA_BASE_URL;
+    function private_CreateRequestUrl(isPut) {
+        var aRetEventUrl = private_ApiBaseUrl + private_DATA_BASE_URL;
 
         if (private_OwnerKey) {
             aRetEventUrl += "/" + private_OwnerKey;
         }
 
-        if (private_DataId) {
+        if (!isPut && private_DataId) {
             aRetEventUrl += "/" + private_DataId;
-        }
-
-        if (aRetEventUrl.indexOf("?") == -1) {
-            // no "?" in URL yet
-            aRetEventUrl += "?user_agent" + SBObj.USER_AGENT;
-        } else {
-            aRetEventUrl += "&user_agent=" + SBObj.USER_AGENT;
         }
 
         return aRetEventUrl;
@@ -92,11 +86,14 @@ function SBObj(theOwnerKey, theDataId) {
      * @param theDataObj {Object} - must contain fields "type" and "content"
      */
     function private_SendDataObj(method, theDataObj) {
-        if (method && theDataObj && theDataObj.type && theDataObj.content) {
-            var aRequest = private_CreateRequest(method, private_CreateRequestUrl());
+        if (method && theDataObj && theDataObj.content) {
+            var aRequest = private_CreateRequest(method,
+                    private_CreateRequestUrl((method === private_METHOD_POST)));
 
             if (aRequest) {
-                aRequest.setRequestHeader("Content-Type", theDataObj.type);
+                if (theDataObj.type) {
+                    aRequest.setRequestHeader("Content-Type", theDataObj.type);
+                }
 
                 aRequest.onload = private_OnLoad;
                 aRequest.onerror = private_OnError;
@@ -106,35 +103,37 @@ function SBObj(theOwnerKey, theDataId) {
         }
     }
 
-    this.DELETE = function () {
-        var aDataObj = {"type": "application/json", "content": "{}"};
-        //no content needed
-        private_SendDataObj("DELETE", aDataObj);
+    this.DELETE = function() {
+        var aDataObj = {
+            "type": "application/json",
+            "content": "{}"
+        };
+        // no content needed
+        private_SendDataObj(private_METHOD_DELETE, aDataObj);
     };
 
-    this.GET = function () {
-        var aDataObj = {"type": "application/json", "content": "{}"};
-        //no content needed
-        private_SendDataObj("GET", aDataObj);
+    this.GET = function() {
+        var aDataObj = {
+            "type": "application/json",
+            "content": "{}"
+        };
+        // no content needed
+        private_SendDataObj(private_METHOD_GET, aDataObj);
     };
 
-    this.PUT = function (theData) {
+    this.PUT = function(theData, theDataContentType) {
+        theDataContentType = this.getDefault(theDataContentType, "text/plain");
+        var aBlob = new Blob([ theData ], {
+            type: theDataContentType
+        });
+
         var aFormData = new FormData();
-        aFormData.append("file", theData);
-        var aDataObj = {"type": "multipart/form-data", "content": aFormData};
+        aFormData.append("file", aBlob);
+        var aDataObj = {
+            "type": false,
+            "content": aFormData
+        };
 
-        private_SendDataObj("POST", aDataObj);
+        private_SendDataObj(private_METHOD_POST, aDataObj);
     };
 }
-
-SBObj.getDefault = function (arg, val) {
-    return typeof arg !== 'undefined' ? arg : val;
-};
-
-SBObj.setApiBaseUrl = function (theNewUrl) {
-    SBObj.API_BASE_URL = theNewUrl;
-};
-
-SBObj.API_BASE_URL = "https://storagebin.appspot.com";
-SBObj.DATA_BASE_URL = "/data";
-SBObj.USER_AGENT = "SB/js_1.0";
