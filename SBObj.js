@@ -10,18 +10,34 @@
  * `getDefault` method body taken from http://stackoverflow.com/a/894877
  */
 function SBObj(theOwnerKey, theDataId) {
-    var private_OwnerKey =  this.getDefault(theOwnerKey, false);
-    var private_DataId = this.getDefault(theDataId, false);
-    var private_OnLoad = function () {};
-    var private_OnError = function () {};
+    var private_ApiBaseUrl = "https://storagebin.appspot.com";
+    var private_DATA_BASE_URL = "/data";
 
-    this.setOnLoad = function (theOnLoadFunc) {
+    var private_METHOD_DELETE = "DELETE";
+    var private_METHOD_GET = "GET";
+    var private_METHOD_POST = "POST";
+
+    var private_OnLoad = function() {};
+    var private_OnError = function() {};
+
+    this.setOnLoad = function(theOnLoadFunc) {
         private_OnLoad = theOnLoadFunc;
     };
 
-    this.setOnError = function (theOnErrorFunc) {
+    this.setOnError = function(theOnErrorFunc) {
         private_OnError = theOnErrorFunc;
     };
+
+    this.getDefault = function(arg, val) {
+        return typeof arg !== 'undefined' ? arg : val;
+    };
+
+    this.setApiBaseUrl = function(theNewUrl) {
+        private_ApiBaseUrl = theNewUrl;
+    };
+
+    var private_OwnerKey = this.getDefault(theOwnerKey, false);
+    var private_DataId = this.getDefault(theDataId, false);
 
     /**
      * create a CORS request object
